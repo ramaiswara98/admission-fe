@@ -1,0 +1,12 @@
+@keyframes bg-change {
+    0% {
+      background-color: #e2e8f0; /* gray-300 */
+    }
+    100% {
+      background-color: #dc2626; /* red-600 */
+    }
+  }
+  
+  .animate-bg-change {
+    animation: bg-change 1s ease-in-out forwards;
+  }
