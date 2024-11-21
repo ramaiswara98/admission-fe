@@ -5,7 +5,7 @@ import React from "react";
 
 function Button(props) {
   return (
-    <div className="font-invisible text-white bg-red-600 rounded-md px-8 py-2 text-center w-fit cursor-pointer" onClick={props.onClick}>
+    <div className={`${props.hidden ==true ?'hidden':''}  font-invisible text-white ${props.type == 'secondary'?'bg-gray-300':'bg-red-600'} rounded-md px-8 py-2 text-center w-fit cursor-pointer`} onClick={props.onClick}>
         {props.social?(
             <div className="flex flex-row justify-center items-center gap-2">
                 <FontAwesomeIcon icon={props.icon} className="text-white"/>

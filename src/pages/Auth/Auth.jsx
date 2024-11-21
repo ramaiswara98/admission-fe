@@ -1,13 +1,17 @@
 import React, { useState } from 'react'
+import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
+
 import TopNav from '../../component/TopNav/TopNav'
 import FormInput from '../../component/FormInput/FormInput';
 import Button from '../../component/Button/Button';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons/faGoogle';
 import { faLinkedin } from '@fortawesome/free-brands-svg-icons/faLinkedin';
 import Radio from '../../component/Radio/Radio';
-
 import usersAPI from '../../api/users'
 import Alert from '../../component/Alert/Alert';
+import axios from 'axios';
+import Modal from '../../component/Modal/Modal';
 
 function Auth() {
     const [state, setState] = useState(0);
@@ -19,6 +23,11 @@ function Auth() {
     const [exist,setExist] = useState(false);
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
+    const [loginMessage, setLoginMessage] = useState('');
+    const [loginFailed, setLoginFailed] = useState(false);
+    const [providerType, setProviderType] = useState('');
+    const [modalDisplay,setModalDisplay] = useState(false);
+    const [providerData, setProviderData] = useState('');
 
 
     const handleOnChanges = (item) => {
@@ -46,6 +55,9 @@ function Auth() {
     const onOptionChanges = (e) => {
       setType(e.target.value);
     }
+    const onOptionChangesProvider = (e) => {
+      setProviderType(e.target.value);
+    }
 
     const SignInButtonClicked = async() => {
       const data = {
@@ -55,9 +67,13 @@ function Auth() {
       }
       const loginStatus = await usersAPI.loginUser(data);
       if(loginStatus.status == "success"){
-        console.log(loginStatus.data);
+        setLoginMessage('');
+        setLoginFailed(false);
+        localStorage.setItem('token',loginStatus.token);
+        window.location.href = '/'
       }else{
-        console.log(loginStatus.message);
+        setLoginMessage(loginStatus.message)
+        setLoginFailed(true);
       }
       
     }
@@ -79,15 +95,80 @@ function Auth() {
             setExist(true);
           }
         }
-        console.log(users);
       }else{
 
+      }
+    }
+
+    const login = useGoogleLogin({
+      onSuccess: async(tokenResponse) => {
+        try{
+          const res =  await axios.get(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            {
+              headers:{
+                Authorization:`Bearer ${tokenResponse.access_token}`
+              }
+            }
+          )
+          const userData = res.data;
+          const data = {
+            name:userData.name,
+            email:userData.email,
+            password:'',
+            type:providerType,
+            provider:'google'
+          }
+          const status = await usersAPI.authProvider(data);
+          if(status.status == "failed"){
+            if(status.message == "user is not exist"){
+              setProviderData(data);
+              setModalDisplay(true);
+            }else{
+
+            }
+          }else{
+            setLoginMessage('');
+            setLoginFailed(false);
+            localStorage.setItem('token',status.token);
+            window.location.href = '/'
+          }
+        }catch(err){
+          console.log(err)
+        }
+      }
+    });
+
+    const onChooseClicked = async() => {
+      if(providerType == ''){
+
+      }else{
+        const data = providerData;
+        data.type = providerType;
+        const status = await usersAPI.authProvider(data);
+        if(status.status == "success"){
+            setLoginMessage('');
+            setLoginFailed(false);
+            localStorage.setItem('token',status.token);
+            setModalDisplay(false);
+            window.location.href = '/'
+        }
       }
     }
 
   return (
     <div className="">
       <TopNav />
+      <Modal open={modalDisplay}>
+        <div>
+          <p className='font-sans mb-2'>Please choose account type first:</p>
+        <div className='flex flex-row gap-2'>
+        <Radio id={"parentp"} text={"Parent"} name='type' onChange = {onOptionChangesProvider} checked={providerType === "parent"} value={'parent'}/>
+        <Radio id={"agentp"} text={"Agent"} name='type' onChange = {onOptionChangesProvider} checked={providerType === "agent"} value={'agent'}/>
+        </div>
+        </div>
+        <Button text={"Choose"} onClick={() => {onChooseClicked()}}/>
+      </Modal>
       <div className="flex flex-row justify-center items-center h-screen mt-[-50px] ">
         <div className="bg-white shadow-md w-fit py-4 px-8 rounded-md">
           <div className="flex flex-col justify-center items-center">
@@ -135,15 +216,15 @@ function Auth() {
                 ></div>
               </div>
             </div>
-
+            
             {state == 0 ? (
               <div className="flex flex-col justify-center items-center">
                 <FormInput label={"Full Name"} type={"text"} name='fullname' onChange = {handleOnChanges} value={fullname}/>
                 <FormInput label={"Email"} type={"email"} name='email' onChange = {handleOnChanges} value={email}/>
                 <FormInput label={"Password"} type={"password"} name='password' onChange = {handleOnChanges} value={password}/>
                 <div className='flex flex-row gap-4 justify-start items-start mb-4'>
-               <Radio id={"parent"} text={"Parent"} name='type' onChange = {onOptionChanges} checked={type === "parent"} value={'parent'}/>
-               <Radio id={"agent"} text={"Agent"} name='type' onChange = {onOptionChanges} checked={type === "agent"} value={'agent'}/>
+                <Radio id={"parent"} text={"Parent"} name='type' onChange = {onOptionChanges} checked={type === "parent"} value={'parent'}/>
+                <Radio id={"agent"} text={"Agent"} name='type' onChange = {onOptionChanges} checked={type === "agent"} value={'agent'}/>
                
                 </div>
                 <Button text="Sign Up" onClick={()=> {SignUpButtonClicked()}}/>
@@ -155,7 +236,7 @@ function Auth() {
                   <div className="bg-red-600 w-full  h-[2px]"></div>
                 </div>
                 <div className="flex flex-row gap-4">
-                  <Button text="Google" social={true} icon={faGoogle} />
+                  <Button text="Google" social={true} icon={faGoogle} onClick={() => login()}/>
                   <Button text="LinkedIn" social={true} icon={faLinkedin} />
                 </div>
               </div>
@@ -164,13 +245,14 @@ function Auth() {
                 <FormInput label={"Email"} type={"email"}  name='email' onChange = {handleLoginOnChanges} value={loginEmail}/>
                 <FormInput label={"Password"} type={"password"} name='password' onChange = {handleLoginOnChanges} value={loginPassword} />
                 <Button text="Sign In" onClick={()=>{SignInButtonClicked()}}/>
+                {loginFailed && <Alert message={loginMessage} type={"danger"}/>}
                 <div className="flex flex-row justify-center items-center w-full m-4">
                   <div className="bg-red-600 w-full h-[2px]"></div>
                   <p className="font-invisible mx-1">OR</p>
                   <div className="bg-red-600 w-full  h-[2px]"></div>
                 </div>
                 <div className="flex flex-row gap-4">
-                  <Button text="Google" social={true} icon={faGoogle} />
+                  <Button text="Google" social={true} icon={faGoogle} onClick={() => login()}/>
                   <Button text="LinkedIn" social={true} icon={faLinkedin} />
                 </div>
               </div>
