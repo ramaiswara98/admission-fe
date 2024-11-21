@@ -18,6 +18,7 @@ import BookConsultation from "./pages/BookConsultation/BookConsultation";
 import AdminBookConsultation from "./pages/Admin/BookConsultation/BookConsultation";
 import Tuition from "./pages/Tuition/Tuition";
 import MyTuition from "./pages/MyTuition/MyTuition";
+import AdminTuition from "./pages/Admin/AdminTuition/AdminTuition";
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
       <Route path="/admin/create-users" element={<CreateUser/>}/>
       <Route path="/admin/edit-users/:id" element={<EditUser/>}/>
       <Route path="/admin/book-consultation" element={<AdminBookConsultation type={"admin"}/>}/>
+      <Route path="/admin/tuition" element={<AdminTuition/>}/>
 
       <Route path="/admin/schools" element={<Schools/>}/>
       <Route path="/admin/create-schools" element={<CreateSchools/>}/>

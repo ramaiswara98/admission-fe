@@ -22,7 +22,18 @@ const getByUserId = async(data) => {
     }
 }
 
+const getAllTuition= async() => {
+    try {
+        const result = await axios.get(`${BASEURL}/tuition/get-all`
+        );
+        return result.data; // Assuming you want to return the user data
+    } catch (err) {
+        return err; // Handle error appropriately
+    }
+}
+
 export default {
     createTuition,
-    getByUserId
+    getByUserId,
+    getAllTuition
 }

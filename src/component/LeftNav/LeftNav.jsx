@@ -41,6 +41,9 @@ function LeftNav(props) {
            <li className={props.menu == 'book-consultation' ? "px-10 py-2 bg-red-600 text-white cursor-pointer font-invisible":"px-10 py-2 hover:bg-gray-300 hover:text-black cursor-pointer font-invisible"} onClick={()=> window.location.href='/admin/book-consultation'}>
            Consultation
          </li>
+         <li className={props.menu == 'tuition' ? "px-10 py-2 bg-red-600 text-white cursor-pointer font-invisible":"px-10 py-2 hover:bg-gray-300 hover:text-black cursor-pointer font-invisible"} onClick={()=> window.location.href='/admin/tuition'}>
+          Tuition
+       </li>
            <li 
          className={props.menu == 'users' ? "px-10 py-2 bg-red-600 text-white cursor-pointer font-invisible":"px-10 py-2 hover:bg-gray-300 hover:text-black cursor-pointer font-invisible"} onClick={()=> window.location.href='/admin/users'}>
            Users
