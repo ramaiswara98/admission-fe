@@ -9,27 +9,88 @@ import { faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 
 function Users() {
     const [userList, setUserList] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [listPage, setListPage] = useState([1, 2, 3]);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [offset, setOffset] = useState(0);
     const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(10);
 
     useEffect(() => {
-        const gettingData = async()=> {
-          const data = {
-            search,
-            page,
-            limit
-          }
-            const users =  await usersAPI.getAllUsers(data);
-            console.log(users);
-            setUserList(users.data);
-        }
-        gettingData();
+      gettingData(0);
     },[])
+
+    const gettingData = async(offsett)=> {
+      const data = {
+        search,
+        offset:offsett
+      }
+        const users =  await usersAPI.getAllUsers(data);
+        console.log(users);
+        setUserList(users.data);
+        setTotalUsers(users.total);
+        const dividePage = users.total%10;
+        if(dividePage != 0){
+          const pages = users.total/10;
+          setTotalPages(parseInt(pages+1))
+          if(pages+1 <3){
+            const list = [];
+            for(let i = 1; i< pages+1;i++){
+              list.push(i);
+            }
+            setListPage(list)
+          }
+        }else{
+          const pages = users.total/10;
+          setTotalPages(parseInt(pages))
+          if(pages+1 <3){
+            const list = [];
+            for(let i = 1; i< pages+1;i++){
+              list.push(i);
+            }
+            setListPage(list)
+          }
+        }
+    }
+
+    const onPageClick = (page) => {
+      setCurrentPage(page)
+      const offsets = ((page-1)*10);
+      setOffset(offsets)
+      console.log(offsets)
+      gettingData(offsets)
+      const pageList = [];
+      if((page-1) > 0 ){
+        pageList.push(page-1);
+        pageList.push(page);
+        if((page+1) > totalPages){
+          pageList.push(page-2)
+        }else{
+          pageList.push(page+1);
+        }
+      }else{
+        pageList.push(page);
+        pageList.push(page+1);
+        pageList.push(page+2);
+      }
+      pageList.sort((a,b)=>a-b);
+      setListPage(pageList);
+  
+    };
+
+    const onSearchChange = (e) => {
+      setSearch(e.target.value)
+    }
+  
+    const onSearchClicked = () => {
+      console.log("Makan")
+      gettingData(0);
+    }
+
   return (
     <div>
       <TopNav />
-      <div className="flex flex-row gap-1 h-min-screen h-fit">
+      <div className="flex flex-row gap-1 min-h-screen h-fit">
         <LeftNav menu={"users"} submenu={"users-list"} />
         <div className="bg-white w-full py-4 px-4">
           <p className="font-invisible text-2xl">Users</p>
@@ -40,12 +101,8 @@ function Users() {
           </div>
           <div className="my-4 flex flex-row justify-between items-center">
             <div className='flex flex-row items-center gap-2'>
-            <FormInput label={"Search"} />
-            <Button text="Search"/>
-            </div>
-            
-            <div>
-                <Button text="Filter"/>
+            <FormInput label={"Search"} onChange={onSearchChange}/>
+            <Button text="Search" onClick={()=> {onSearchClicked()}}/>
             </div>
           </div>
           <div>
@@ -80,16 +137,17 @@ function Users() {
             </table>
             <div className='flex flex-row justify-between items-center mt-8'>
                 <div>
-                    <p>10/Page</p>
+                    <p className='font-invisible'>Showing {offset+1} to {offset+10} of {totalUsers}</p>
                 </div>
-                <div className='flex flex-row gap-2 items-center'>
-                    <Button text="1"/>
-                    <Button text="2"/>
-                    <Button text="3"/>
-                    <Button text=">|"/>
-                </div>
+                <div className="flex flex-row gap-3">
+              <Button text={"First"} onClick={()=> {onPageClick(1)}} hidden={currentPage ==1 || currentPage ==2?true:false}/>
+                {listPage.map((item, index) => (
+                  <Button type={item.toString() == currentPage?'secondary':''} key={index} text={item.toString()} onClick={()=> {onPageClick(item)}}/>
+                ))}
+                <Button   text={"Last"} onClick={()=> {onPageClick(totalPages)}} hidden={currentPage == totalPages || currentPage == totalPages-1?true:false}/>
+              </div>
                 <div>
-                    <p>Show 10 of 200</p>
+                    <p className='font-invisible'>Page {currentPage} of {totalPages}</p>
                 </div>
             </div>
           </div>

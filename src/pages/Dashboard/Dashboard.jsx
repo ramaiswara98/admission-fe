@@ -10,7 +10,7 @@ function Dashboard() {
             className='flex flex-row gap-1'
         >
             <LeftNav menu={'dashboard'}/>
-            <div className='bg-white w-full py-4'>
+            <div className='bg-white w-full py-4 min-h-screen'>
                 
             </div>
 

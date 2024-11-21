@@ -19,6 +19,7 @@ import paymentAPI from '../../api/payment'
 import meetingsAPI from '../../api/meetings'
 import mailAPI from '../../api/mail'
 import bookingConsultationAPI from '../../api/bookingConsultation';
+import settingsAPI from '../../api/settings'
 
 function BookConsultation() {
     const [next10Days, setNext10Days] = useState(getNext10WorkingDays());
@@ -36,6 +37,8 @@ function BookConsultation() {
     const [clientSecret, setClientSecret] = useState(null);
     const [paymentStatus, setPaymentStatus] = useState(null);
     const [meetingDetails, setMeetingDetails] = useState(null);
+    const [settings, setSettings] = useState(null);
+
     useEffect(()=> {
         getSchoolInfo();
         const token = localStorage.getItem("token");
@@ -45,18 +48,28 @@ function BookConsultation() {
     },[])
 
     useEffect(()=> {
-        const getClient = async () => {
-            const clientSecret = await paymentAPI.createPaymentIntent({amount:100.00})
+        getSettings();
+       
+        
+    },[])
+
+    const getSettings = async() => {
+        const getSettingsCall = await settingsAPI.getSettings();
+        if(getSettingsCall.status == 'success'){
+            setSettings(getSettingsCall.data);
+            getClient(getSettingsCall.data)
+        }
+    }
+
+    const getClient = async (setting) => {
+        const clientSecret = await paymentAPI.createPaymentIntent({amount:parseFloat(setting.consultation_price+'.00')})
         if(clientSecret.status == 'success'){
             setClientSecret(clientSecret.data.clientSecret)
         // console.log(clientSecret);
         }else{
         // console.log(clientSecret);
         }
-        }
-        getClient();
-        
-    },[])
+    }
     
     async function getTokenData (token) {
         try {
@@ -235,7 +248,7 @@ function BookConsultation() {
         };
         const data2 = {
             fullname: "Admission Staff",
-            email: 'ramawari@acktechnologies.com',
+            email: settings.admin_email,
             subject: "Booking Consultation About " + school?.school_name,
             body: `<p>Dear Admission Staff </p>
                    <p>Here is a details of book consultation from ${fullname} about ${school?.school_name}:</p>

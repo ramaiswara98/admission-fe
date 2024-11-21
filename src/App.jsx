@@ -19,6 +19,7 @@ import AdminBookConsultation from "./pages/Admin/BookConsultation/BookConsultati
 import Tuition from "./pages/Tuition/Tuition";
 import MyTuition from "./pages/MyTuition/MyTuition";
 import AdminTuition from "./pages/Admin/AdminTuition/AdminTuition";
+import Settings from "./pages/Admin/Settings/Settings";
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
       <Route path="/admin/edit-users/:id" element={<EditUser/>}/>
       <Route path="/admin/book-consultation" element={<AdminBookConsultation type={"admin"}/>}/>
       <Route path="/admin/tuition" element={<AdminTuition/>}/>
+      <Route path="/admin/settings" element={<Settings/>}/>
 
       <Route path="/admin/schools" element={<Schools/>}/>
       <Route path="/admin/create-schools" element={<CreateSchools/>}/>

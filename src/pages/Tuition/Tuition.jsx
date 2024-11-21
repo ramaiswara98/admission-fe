@@ -13,6 +13,7 @@ import paymentAPI from '../../api/payment'
 import tuitionAPI from '../../api/tuition'
 import { jwtDecode } from 'jwt-decode'
 import mailAPI from '../../api/mail'
+import settingsAPI from '../../api/settings'
 
 function Tuition() {
     const subject = [
@@ -165,6 +166,15 @@ function Tuition() {
     const [price, setPrice] = useState(100.00);
     const [login, setLogin] = useState(false);
     const [user, setUser] = useState(null);
+    const [settings, setSettings] = useState(null);
+
+    const getSettings = async() => {
+        const getSettingsCall = await settingsAPI.getSettings();
+        if(getSettingsCall.status == 'success'){
+            setSettings(getSettingsCall.data);
+            setPrice(getSettingsCall.data.tuition_price)
+        }
+    }
 
     const getClient = async () => {
         const clientSecret = await paymentAPI.createPaymentIntent({amount:parseInt(selectedSession.value*price)})
@@ -175,6 +185,7 @@ function Tuition() {
     }
 
     useEffect(() => {
+        getSettings();
         const token = localStorage.getItem("token");
         if (token !== null) {
           setLogin(true);
@@ -286,7 +297,7 @@ function Tuition() {
         };
         const data2 = {
             fullname: "Admission Staff",
-            email: 'ramawari@acktechnologies.com',
+            email: settings.admin_email,
             subject: "Tuition " + selectedSubject.label,
             body: `<p>Dear Admission Staff </p>
                    <p>Here are tuition detail from ${name}:</p>
@@ -324,20 +335,20 @@ function Tuition() {
                 <div className='px-2 py-2 bg-red-600 rounded-full w-8 h-8 flex flex-row justify-center'>
                     <FontAwesomeIcon icon={faPerson} className='text-white'/>
                 </div>
-                <div class={` bg-red-600 h-1 w-20`}></div>
-                <div className='px-2 py-2 bg-red-600 rounded-full w-8 h-8 flex flex-row justify-center'>
+                <div class={` ${tab>1?'bg-red-600':'bg-gray-400'} h-1 w-20`}></div>
+                <div className={`px-2 py-2 ${tab > 1 ? 'bg-red-600 ':'bg-gray-400'} rounded-full w-8 h-8 flex flex-row justify-center`}>
                     <FontAwesomeIcon icon={faBook} className='text-white'/>
                 </div>
-                <div class={` bg-red-600 h-1 w-20`}></div>
-                <div className='px-2 py-2 bg-red-600 rounded-full w-8 h-8 flex flex-row justify-center'>
+                <div class={` ${tab>2?'bg-red-600':'bg-gray-400'} h-1 w-20`}></div>
+                <div className={`px-2 py-2 ${tab > 2 ? 'bg-red-600 ':'bg-gray-400'} rounded-full w-8 h-8 flex flex-row justify-center`}>
                     <FontAwesomeIcon icon={faCalendarDay} className='text-white'/>
                 </div>
-                <div class={` bg-red-600 h-1 w-20`}></div>
-                <div className='px-2 py-2 bg-red-600 rounded-full w-8 h-8 flex flex-row justify-center'>
+                <div class={` ${tab>3?'bg-red-600':'bg-gray-400'} h-1 w-20`}></div>
+                <div className={`px-2 py-2 ${tab > 3 ? 'bg-red-600 ':'bg-gray-400'} rounded-full w-8 h-8 flex flex-row justify-center`}>
                     <FontAwesomeIcon icon={faMoneyBill} className='text-white'/>
                 </div>
-                <div class={` bg-red-600 h-1 w-20`}></div>
-                <div className='px-2 py-2 bg-red-600 rounded-full w-8 h-8 flex flex-row justify-center'>
+                <div class={` ${tab>4?'bg-red-600':'bg-gray-400'} h-1 w-20`}></div>
+                <div className={`px-2 py-2 ${tab > 4 ? 'bg-red-600 ':'bg-gray-400'} rounded-full w-8 h-8 flex flex-row justify-center`}>
                     <FontAwesomeIcon icon={faCheckCircle} className='text-white'/>
                 </div>
             </div>
