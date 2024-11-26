@@ -64,7 +64,7 @@ function Settings() {
     <div>
         <TopNav/>
         <div className='flex flex-row gap-1'>
-            <LeftNav/>
+            <LeftNav menu={'settings'}/>
             <div className='bg-white min-h-screen w-full px-4 py-4'>
                 <p className='font-invisible text-2xl'>Settings</p>
                 <Lines/>

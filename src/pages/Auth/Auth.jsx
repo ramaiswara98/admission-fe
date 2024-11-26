@@ -12,6 +12,7 @@ import usersAPI from '../../api/users'
 import Alert from '../../component/Alert/Alert';
 import axios from 'axios';
 import Modal from '../../component/Modal/Modal';
+import mailAPI from '../../api/mail';
 
 function Auth() {
     const [state, setState] = useState(0);
@@ -28,6 +29,9 @@ function Auth() {
     const [providerType, setProviderType] = useState('');
     const [modalDisplay,setModalDisplay] = useState(false);
     const [providerData, setProviderData] = useState('');
+    const siteName = import.meta.env.VITE_SITE_TITLE;
+    const [signUpAlert, setSignUPAlert] = useState('');
+    const [googleAlert, setGoogleAlert] = useState('');
 
 
     const handleOnChanges = (item) => {
@@ -79,6 +83,7 @@ function Auth() {
     }
 
     const SignUpButtonClicked = async() => {
+      setSignUPAlert(<Alert type={'normal'} message={'Loading...'} />)
       if(fullname !== '' && email !== '' && password !== '' && type !=='' ){
         const data = {
           name:fullname,
@@ -89,7 +94,8 @@ function Auth() {
         }
         const users =await usersAPI.createNewUser(data);
         if(users.status == "success"){
-
+            await sendEmail(data);
+            console.log("Register");
         }else{
           if(users.message == 'user already exist'){
             setExist(true);
@@ -140,20 +146,63 @@ function Auth() {
     });
 
     const onChooseClicked = async() => {
+      setGoogleAlert(<Alert type={'normal'} message={'Loading...'}/>)
       if(providerType == ''){
 
       }else{
         const data = providerData;
         data.type = providerType;
         const status = await usersAPI.authProvider(data);
-        if(status.status == "success"){
+        if(status.status == "success"){ 
+            await sendEmailGoogle(data);
             setLoginMessage('');
             setLoginFailed(false);
             localStorage.setItem('token',status.token);
+            setGoogleAlert(<Alert type={'success'} message={'Successfully Registered'}/>)
             setModalDisplay(false);
             window.location.href = '/'
         }
       }
+    }
+
+    const sendEmail = async(user) => {
+      const data = {
+        fullname: user.name,
+        email: user.email,
+        subject: "Welcome to " + import.meta.env.VITE_SITE_TITLE+'!',
+        body: `<p>Dear <strong>${user.name}</strong>, </p>
+               <h3>Welcome to ${import.meta.env.VITE_SITE_TITLE}!</h3>
+               <p>You can now access <strong>${import.meta.env.VITE_SITE_TITLE}</strong> using the credentials below:</p>
+               <p><strong>Login URL: <a href='${import.meta.env.VITE_DOMAIN}/auth' >${import.meta.env.VITE_DOMAIN}/auth</a></strong></p>
+               <p><strong>Email: ${user.email}</strong></p>
+               <p><strong>Password: ${user.password}</strong></p>
+               <br/><br/><br/>
+               <p>Kind Regards,</p>
+               <p>Admission Site Team</p>`
+      };
+      const mail = await mailAPI.sendConsultation(data);
+      setFullName('');
+      setEmail('');
+      setPassword('');
+      setSignUPAlert(<Alert type={'success'} message={'Sign up Successfully'}/>);
+
+    }
+
+
+    const sendEmailGoogle = async(user) => {
+      const data = {
+        fullname: user.name,
+        email: user.email,
+        subject: "Welcome to " + import.meta.env.VITE_SITE_TITLE+'!',
+        body: `<p>Dear <strong>${user.name}</strong>, </p>
+               <h3>Welcome to ${import.meta.env.VITE_SITE_TITLE}!</h3>
+               <p>You can now access <strong>${import.meta.env.VITE_SITE_TITLE}</strong> by login using your google account:</p>
+               <br/><br/><br/>
+               <p>Kind Regards,</p>
+               <p>Admission Site Team</p>`
+      };
+      const mail = await mailAPI.sendConsultation(data);
+
     }
 
   return (
@@ -166,6 +215,7 @@ function Auth() {
         <Radio id={"parentp"} text={"Parent"} name='type' onChange = {onOptionChangesProvider} checked={providerType === "parent"} value={'parent'}/>
         <Radio id={"agentp"} text={"Agent"} name='type' onChange = {onOptionChangesProvider} checked={providerType === "agent"} value={'agent'}/>
         </div>
+        {googleAlert}
         </div>
         <Button text={"Choose"} onClick={() => {onChooseClicked()}}/>
       </Modal>
@@ -229,7 +279,7 @@ function Auth() {
                 </div>
                 <Button text="Sign Up" onClick={()=> {SignUpButtonClicked()}}/>
                   {exist && <Alert message={"Email already exist"} type={"danger"}/>}
-                
+                  {signUpAlert}
                 <div className="flex flex-row justify-center items-center w-full m-4">
                   <div className="bg-red-600 w-full h-[2px]"></div>
                   <p className="font-invisible mx-1">OR</p>
