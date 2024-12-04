@@ -32,6 +32,7 @@ function FindSchool() {
     const getSchool = await schoolAPI.findSchools(data);
     if (getSchool.status === 'success') {
       setAllSchoolData(getSchool.data);
+      console.log(getSchool.data);
       setFilteredSchoolData(getSchool.data); // Set filtered data to be the same as all data initially
     }
   };

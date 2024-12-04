@@ -235,8 +235,9 @@ function SchoolDetails() {
   return (
     <div className="">
       <TopNav />
-      <div className="bg-white py-4 fixed bottom-0 left-0 w-full flex justify-center">
+      <div className="bg-white py-4 fixed bottom-0 left-0 w-full flex justify-center gap-2">
         <Button text={"Book Consultation"} onClick={()=> {window.location.href = '/bookconsultation/'+id}}/>
+        <Button text={"Book School Tour"} onClick={()=> {window.location.href = '/book-tour/'+id}}/>
       </div>
       <div className="min-h-screen my-4 mx-10 mb-20">
         <div className="flex flex-row gap-4 items-center justify-center">
@@ -505,9 +506,9 @@ function SchoolDetails() {
                   </div>
                   <div className={`${special ? "" : "hidden"} py-4`}>
                     <ul>
+                      {/* <li>Basic Chinese Language</li>
                       <li>Basic Chinese Language</li>
-                      <li>Basic Chinese Language</li>
-                      <li>Basic Chinese Language</li>
+                      <li>Basic Chinese Language</li> */}
                     </ul>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import React from "react"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import 'leaflet/dist/leaflet.css';
 
 import Home from "./pages/Home/Home"
 import Auth from "./pages/Auth/Auth"
@@ -20,6 +21,7 @@ import Tuition from "./pages/Tuition/Tuition";
 import MyTuition from "./pages/MyTuition/MyTuition";
 import AdminTuition from "./pages/Admin/AdminTuition/AdminTuition";
 import Settings from "./pages/Admin/Settings/Settings";
+import SchoolTour from "./pages/SchoolTour/SchoolTour";
 
 
 function App() {
@@ -48,6 +50,7 @@ function App() {
       <Route path="/admin/schools" element={<Schools/>}/>
       <Route path="/admin/create-schools" element={<CreateSchools/>}/>
       <Route path="/admin/edit-schools/:id" element={<EditSchools/>}/>
+      <Route path="/book-tour/:id" element={<SchoolTour/>}/>
     </Routes>
   </BrowserRouter>
   </GoogleOAuthProvider>

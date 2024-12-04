@@ -20,6 +20,7 @@ import meetingsAPI from '../../api/meetings'
 import mailAPI from '../../api/mail'
 import bookingConsultationAPI from '../../api/bookingConsultation';
 import settingsAPI from '../../api/settings'
+import Alert from '../../component/Alert/Alert';
 
 function BookConsultation() {
     const [next10Days, setNext10Days] = useState(getNext10WorkingDays());
@@ -38,6 +39,7 @@ function BookConsultation() {
     const [paymentStatus, setPaymentStatus] = useState(null);
     const [meetingDetails, setMeetingDetails] = useState(null);
     const [settings, setSettings] = useState(null);
+    const [summaryLoading, setSummaryLoading] = useState('');
 
     useEffect(()=> {
         getSchoolInfo();
@@ -101,7 +103,7 @@ function BookConsultation() {
 
     
 
-    const nextStepClicked = () => {
+    const nextStepClicked = async() => {
         const currentStep = step;
         if(currentStep == 1){
             if(selectedDate == null){
@@ -127,15 +129,17 @@ function BookConsultation() {
 
                     }else{
                         setStep(currentStep+1);
+                        setSummaryLoading(<Alert type={'normal'} message={'loading..'} />)
+                        await createMeetings()
                     }
                 }
             }
         }
-        if(currentStep == 3){
-            if(paymentStatus == "success"){
-                setStep(currentStep+1);
-            }
-        }
+        // if(currentStep == 3){
+        //     if(paymentStatus == "success"){
+        //         setStep(currentStep+1);
+        //     }
+        // }
         // if(currentStep+1 <5){
         //     setStep(currentStep+1);
         // }else{
@@ -203,8 +207,10 @@ function BookConsultation() {
             agenda:"Cosultation "+school?.school_name+" With "+fullname,
             approval_type:0
         }
+        setSummaryLoading(<Alert type={'normal'} message={'Wait a moment, we currently scheduling a meeting for your consultation'} />)
         const createMeetings = await meetingsAPI.createMeeting(data);
         if(createMeetings.status == "success"){
+            setSummaryLoading(<Alert type={'normal'} message={'Wait a moment, we currently sending the booking details to your email'} />)
             saveBooking(createMeetings.data);
             setMeetingDetails(createMeetings.data);
             const currentStep = step;
@@ -266,6 +272,7 @@ function BookConsultation() {
 
         const sendUserMail = await mailAPI.sendConsultation(data);
         const sendUserMail2 = await mailAPI.sendConsultation(data2);
+        setSummaryLoading('')
         
     }
 
@@ -292,15 +299,15 @@ function BookConsultation() {
                             <FontAwesomeIcon icon={faPerson} className={`${step >=2?'text-white':'text-black'}`}/>
                         </div>
                     </div>
-                    <div class={`${step >=3?'bg-red-600':'bg-gray-300'} h-1 w-20`}></div>
+                    {/* <div class={`${step >=3?'bg-red-600':'bg-gray-300'} h-1 w-20`}></div>
                     <div className='flex flex-row items-center gap-2'>
                     <div className={`w-12 h-12 ${step >=3?'bg-red-600':'bg-gray-300'} rounded-full px-1 py-1 flex flex-row items-center justify-center`}>                            
                         <FontAwesomeIcon icon={faMoneyBill} className={`${step >=3?'text-white':'text-black'}`}/>
                         </div>
-                    </div>
-                    <div class={`${step ==4?'bg-red-600':'bg-gray-300'} h-1 w-20`}></div>
+                    </div> */}
+                    <div class={`${step ==3?'bg-red-600':'bg-gray-300'} h-1 w-20`}></div>
                     <div className='flex flex-row items-center gap-2'>
-                    <div className={`w-12 h-12 ${step ==4?'bg-red-600':'bg-gray-300'} rounded-full px-1 py-1 flex flex-row items-center justify-center`}>                            
+                    <div className={`w-12 h-12 ${step ==3?'bg-red-600':'bg-gray-300'} rounded-full px-1 py-1 flex flex-row items-center justify-center`}>                            
                         <FontAwesomeIcon icon={faClipboardCheck} className={`${step ==4?'text-white':'text-black'}`}/>
                         </div>
                     </div>
@@ -362,7 +369,7 @@ function BookConsultation() {
                 
 
                 {/* Third Step */}
-                {step == 3 &&(
+                {/* {step == 3 &&(
                     <div className='bg-white py-2 px-2 flex flex-col items-center gap-2 my-2 w-96'>
                     <div className='w-80'>
                         {paymentStatus != "success" ?(
@@ -377,10 +384,11 @@ function BookConsultation() {
                    
                     </div>
                 </div>
-                )}
+                )} */}
 
                 {/* Four Step */}
-                {step == 4 && (
+                {step == 3 && (<>
+                   {summaryLoading == '' ? (
                     <div className='bg-white py-2 px-2 flex flex-col items-center gap-2 my-2 w-96'>
                     <div className='w-80'>
                         <p className='font-invisible text-xl'>Successfully Book Consultation</p>
@@ -395,18 +403,26 @@ function BookConsultation() {
                         </div>
 
                         <div className='flex flex-row justify-center mt-4'>
-                        <Button text={'View Details'} />
+                        <Button text={'View Details'} onClick={()=> {window.location.href = '/my-tuition'}}/>
                         </div>
                     </div>
                     </div>
+                   ):(
+                    <div className='bg-white py-2 px-2 flex flex-col items-center gap-2 my-2 w-96'>
+                    <div className='w-80'>
+                        {summaryLoading}
+                    </div>
+                    </div>
+                   )}
+                   </>
                 )}
                 
                 <div className='bg-white py-2 px-2 justify-center flex flex-row gap-4 w-96'>
                     <div className='w-96 flex flex-row justify-end gap-4'>
-                        {step > 1 && step <3 && (
+                        {step > 1 && step <2 && (
                             <Button text={"Back"} onClick={()=>{backStepClicked()}}/>
                         )}
-                        {step <4 && (
+                        {step <3 && (
                             <Button text={"Next"} onClick={()=>{nextStepClicked()}}/>
                         )}
                         

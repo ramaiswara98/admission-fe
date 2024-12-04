@@ -1,10 +1,14 @@
-import React, { Image } from "react";
+import React, { Image, useEffect, useState } from "react";
+import mapsAPI from "../../api/maps";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import 'leaflet/dist/leaflet.css';
 
 import SchoolDefault from "../../assets/images/school.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faLocationDot} from "@fortawesome/free-solid-svg-icons"
 
 function SchoolCard({ schoolName, schoolType, schoolAddress, schoolArea,schoolCurriculum,schoolLanguage, schoolId, schoolLogo }) {
+  const position= [37.7749, -122.4194];
   return (
     <div className="bg-white p-4 rounded-sm flex flex-row justify-between items-center my-4 cursor-pointer" onClick={()=>{ window.location.href = '/schools/'+schoolType+'/'+schoolId}}>
       <div className="flex flex-row gap-4 items-center">
@@ -48,17 +52,20 @@ function SchoolCard({ schoolName, schoolType, schoolAddress, schoolArea,schoolCu
         </div>
       </div>
 
-      <div>
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.7373283412676!2d103.83846217587205!3d1.3337735986535875!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da175cf71bbd25%3A0xff72342339285cab!2s490%20Thomson%20Rd%2C%20Singapore%20298191!5e0!3m2!1sid!2sid!4v1729187888477!5m2!1sid!2sid"
-          width="150"
-          height="150"
-          className="rounded-lg"
-          style={{ border: 0 }}
-          allowFullScreen=""
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
+      <div className="">
+      <MapContainer center={position} zoom={13} style={{ height: "200px", width: "200px" }}>
+      <TileLayer
+        attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"   
+
+      />
+      <Marker position={position}>
+        <Popup>
+          San   
+ Francisco
+        </Popup>
+      </Marker>
+    </MapContainer>
       </div>
     </div>
   );

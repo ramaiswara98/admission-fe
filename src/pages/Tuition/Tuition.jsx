@@ -14,6 +14,7 @@ import tuitionAPI from '../../api/tuition'
 import { jwtDecode } from 'jwt-decode'
 import mailAPI from '../../api/mail'
 import settingsAPI from '../../api/settings'
+import Alert from '../../component/Alert/Alert'
 
 function Tuition() {
     const subject = [
@@ -167,6 +168,7 @@ function Tuition() {
     const [login, setLogin] = useState(false);
     const [user, setUser] = useState(null);
     const [settings, setSettings] = useState(null);
+    const [summaryLoading, setSummaryLoading] = useState('');
 
     const getSettings = async() => {
         const getSettingsCall = await settingsAPI.getSettings();
@@ -238,8 +240,11 @@ function Tuition() {
         }
         if(current == 3){
             if(selectedSession != null && day != null && time != null && startDate != null){
-                await getClient();
+                // await getClient();
                 setTab(current+1);
+                setSummaryLoading(<Alert type={'normal'} message={'Loading...'} />)
+                await storeTuition();
+                
                
             }else{
                 console.log(selectedSession+'-'+day+'-'+time+'-'+startDate)
@@ -247,14 +252,16 @@ function Tuition() {
         }
         if(current == 4){
             // processing();
+            await storeTuition();
             setTab(current+1);
         }
     }
 
     const storeTuition = async() => {
-        saveTuition();
+        await saveTuition();
         await sendMail();
-        onNextButtonClicked();
+        setSummaryLoading('')
+        // onNextButtonClicked();
     }
     const saveTuition = async() => {
         const data = {
@@ -280,6 +287,7 @@ function Tuition() {
     }
 
     const sendMail = async(meetings)=> {
+        setSummaryLoading(<Alert type={'normal'} message={'Wait a moment, we currently sending the details to your email'} />)
         const data = {
             fullname: name,
             email: email,
@@ -343,12 +351,12 @@ function Tuition() {
                 <div className={`px-2 py-2 ${tab > 2 ? 'bg-red-600 ':'bg-gray-400'} rounded-full w-8 h-8 flex flex-row justify-center`}>
                     <FontAwesomeIcon icon={faCalendarDay} className='text-white'/>
                 </div>
-                <div class={` ${tab>3?'bg-red-600':'bg-gray-400'} h-1 w-20`}></div>
+                {/* <div class={` ${tab>3?'bg-red-600':'bg-gray-400'} h-1 w-20`}></div>
                 <div className={`px-2 py-2 ${tab > 3 ? 'bg-red-600 ':'bg-gray-400'} rounded-full w-8 h-8 flex flex-row justify-center`}>
                     <FontAwesomeIcon icon={faMoneyBill} className='text-white'/>
-                </div>
-                <div class={` ${tab>4?'bg-red-600':'bg-gray-400'} h-1 w-20`}></div>
-                <div className={`px-2 py-2 ${tab > 4 ? 'bg-red-600 ':'bg-gray-400'} rounded-full w-8 h-8 flex flex-row justify-center`}>
+                </div> */}
+                <div class={` ${tab>3?'bg-red-600':'bg-gray-400'} h-1 w-20`}></div>
+                <div className={`px-2 py-2 ${tab > 3 ? 'bg-red-600 ':'bg-gray-400'} rounded-full w-8 h-8 flex flex-row justify-center`}>
                     <FontAwesomeIcon icon={faCheckCircle} className='text-white'/>
                 </div>
             </div>
@@ -386,7 +394,7 @@ function Tuition() {
                     </div>
                 )}
 
-                {tab == 4 && (
+                {/* {tab == 4 && (
                     <div>
                         <div className='shadow-md my-4 px-2 rounded-sm'>
                             <div className='flex flex-row justify-between'>
@@ -411,19 +419,22 @@ function Tuition() {
                         )}
                          
                     </div>
-                )}
+                )} */}
 
-                {tab ==5 && (
+                {tab ==4 && (
                     <div>
                         <p className='font-invisible text-lg'>Summary</p>
                         <Lines/>
-                        <div>
-                            <p>Subject: <span className='font-invisible'>{selectedSubject.label}</span></p>
-                            <p>Grade: <span className='font-invisible'>{selectedGrade.label}</span></p>
-                            <p>Total Session: <span className='font-invisible'>{selectedSession.value}</span></p>
-                            <p>Session Schedule: <span className='font-invisible'>{day.label} {time.value}</span></p>
-                            <p>First Session: <span className='font-invisible'>{startDate}</span></p>
-                        </div>
+
+                        {summaryLoading == '' ?(
+                             <div>
+                                <p>Subject: <span className='font-invisible'>{selectedSubject.label}</span></p>
+                                <p>Grade: <span className='font-invisible'>{selectedGrade.label}</span></p>
+                                <p>Total Session: <span className='font-invisible'>{selectedSession.value}</span></p>
+                                <p>Session Schedule: <span className='font-invisible'>{day.label} {time.value}</span></p>
+                                <p>First Session: <span className='font-invisible'>{startDate}</span></p>
+                            </div>
+                        ):summaryLoading}
                     </div>
                 )}
             </div>

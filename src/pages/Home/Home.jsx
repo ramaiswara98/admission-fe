@@ -6,6 +6,9 @@ import TopNav from '../../component/TopNav/TopNav'
 import Button from '../../component/Button/Button'
 import Radio from '../../component/Radio/Radio'
 import { useNavigate } from 'react-router-dom'
+import Lines from '../../component/Lines/Lines'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBuilding, faChalkboardTeacher, faHotel, faHouseChimneyUser, faHouseMedicalFlag, faSchool, faVanShuttle } from '@fortawesome/free-solid-svg-icons'
 
 function Home() {
   const navigate = useNavigate();
@@ -30,7 +33,7 @@ function Home() {
   return (
     <div style={{ backgroundImage: `url(${HappyKids})`, backgroundRepeat:'no-repeat', backgroundPosition:'center', backgroundSize:'cover' }} className='h-screen'>
       <TopNav/>
-    <div className='flex flex-row w-screen h-screen items-center px-10 justify-between'>
+    <div className='flex flex-row w-screen h-screen items-center px-10 justify-between '>
       <div>
         <p className='font-invisible text-white text-5xl w-96 text-wrap'><span className='text-red-600'>Singapore</span> School Database</p>
         <p className='font-sans text-white text-xl mb-4'>Find, research, and compare the best singapore schools</p>
@@ -59,6 +62,60 @@ function Home() {
               <Button text={"Find School"} onClick = {()=> {onFindSchoolClicked()}}/>
             </div>
           </div>
+      </div>
+    </div>
+    <div className='flex flex-col items-center'>
+      <div className='flex flex-col justify-center items-center my-4'>
+        <p className='font-invisible text-3xl'>Our Service</p>
+        <Lines/>
+        <p className='font-sans'>We offer tailored solutions to meet your needs in education, from pre-admission, admission, and post-admission.</p>
+
+      </div>
+      <div className='flex flex-row gap-4 my-4'>
+        <div className='bg-white p-4 flex flex-col items-start gap-4 w-52 rounded-md'>
+          <div className='bg-red-300 px-2 py-2 rounded-md'>
+          <FontAwesomeIcon icon={faSchool} className='text-2xl text-red-600'/>
+          </div>
+          <p className='font-invisible text-xl'>Find School</p>
+          <p className='font-gray'>Discover the best schools to match your preferences and goals.</p>
+        </div>
+        <div className='bg-white p-4 flex flex-col items-start gap-4 w-52 rounded-md'>
+          <div className='bg-red-300 px-2 py-2 rounded-md'>
+          <FontAwesomeIcon icon={faChalkboardTeacher} className='text-2xl text-red-600'/>
+          </div>
+          <p className='font-invisible text-xl'>Find Tutor</p>
+          <p className='font-gray'>Connect with expert tutors for personalized learning support.</p>
+        </div>
+        <div className='bg-white p-4 flex flex-col items-start gap-4 w-52 rounded-md'>
+          <div className='bg-red-300 px-2 py-2 rounded-md'>
+          <FontAwesomeIcon icon={faHouseChimneyUser} className='text-2xl text-red-600'/>
+          </div>
+          <p className='font-invisible text-xl'>Find Guardian</p>
+          <p className='font-gray'>Locate trusted guardians to ensure your child's safety and care.</p>
+        </div>  
+      </div>
+      <div className='flex flex-row gap-4 my-4'>
+        <div className='bg-white p-4 flex flex-col items-start gap-4 w-52 rounded-md'>
+          <div className='bg-red-300 px-2 py-2 rounded-md'>
+          <FontAwesomeIcon icon={faHotel} className='text-2xl text-red-600'/>
+          </div>
+          <p className='font-invisible text-xl'>Find Apartment</p>
+          <p className='font-gray'>Find comfortable apartments suited to your lifestyle and budget.</p>
+          </div>
+          <div className='bg-white p-4 flex flex-col items-start gap-4 w-52 rounded-md'>
+            <div className='bg-red-300 px-2 py-2 rounded-md'>
+            <FontAwesomeIcon icon={faVanShuttle} className='text-2xl text-red-600'/>
+            </div>
+            <p className='font-invisible text-xl'>Airport Transport</p>
+            <p className='font-gray'>Book reliable airport transport services for hassle-free travel.</p>
+        </div> 
+        {/* <div className='bg-white p-4 flex flex-col items-start gap-4 w-52'>
+            <div className='bg-red-300 px-2 py-2 rounded-md'>
+            <FontAwesomeIcon icon={faHouseChimneyUser} className='text-2xl text-red-600'/>
+            </div>
+            <p className='font-invisible text-xl'>Airport Transport</p>
+            <p className='font-gray'>Lorem ipsum odor amet, consectetuer adipiscing elit.</p>
+        </div>  */}
       </div>
     </div>
     </div>
